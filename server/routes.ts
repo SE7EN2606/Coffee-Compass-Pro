@@ -176,8 +176,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Google Maps API Key endpoint
   app.get("/api/get-maps-key", (req: Request, res: Response) => {
     try {
-      // Get the API key from environment variables
-      const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+      // Use the API key directly provided by user
+      // Since environment variables aren't working correctly, we'll hardcode it just for this demo
+      const apiKey = "AIzaSyB7k9OzFNfair6vp-EDCVaBilH_DL4ebM8";
       
       if (!apiKey) {
         return res.status(500).json({ 
