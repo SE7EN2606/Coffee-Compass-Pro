@@ -1,4 +1,4 @@
-import type { Express, Request, Response } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { z } from "zod";
@@ -170,6 +170,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error adding review:", error);
       res.status(500).json({ message: "Failed to add review" });
+    }
+  });
+
+  // Google Maps API Key endpoint
+  app.get("/api/get-maps-key", (req: Request, res: Response) => {
+    try {
+      // Get the API key from environment variables
+      const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+      
+      if (!apiKey) {
+        return res.status(500).json({ 
+          error: true, 
+          message: "Google Maps API key is not configured" 
+        });
+      }
+      
+      res.json({ key: apiKey });
+    } catch (error) {
+      console.error("Error retrieving Google Maps API key:", error);
+      res.status(500).json({ 
+        error: true, 
+        message: "Failed to retrieve Google Maps API key" 
+      });
     }
   });
 
