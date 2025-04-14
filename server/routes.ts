@@ -36,6 +36,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to search coffee shops" });
     }
   });
+  
+  app.post("/api/coffee-shops", async (req: Request, res: Response) => {
+    try {
+      // In a real implementation, we would use insertCoffeeShopSchema
+      // For now, we'll create a basic validation schema
+      const schema = z.object({
+        name: z.string().min(2),
+        address: z.string().min(5),
+        description: z.string(),
+        phone: z.string().optional(),
+        website: z.string().optional(),
+        openingTime: z.string(),
+        closingTime: z.string(),
+        weekdayHours: z.string(),
+        weekendHours: z.string(),
+        hasWifi: z.boolean(),
+        tags: z.array(z.string()).or(z.string().transform(val => val.split(',').map(tag => tag.trim()))),
+        popularItems: z.array(z.string()).or(z.string().transform(val => val.split(',').map(item => item.trim()))).optional(),
+      });
+
+      const validatedData = schema.parse(req.body);
+      
+      // Generate random values for demo
+      const latitude = 40.7128 + (Math.random() - 0.5) * 0.1;
+      const longitude = -74.0060 + (Math.random() - 0.5) * 0.1;
+      
+      // Use a random image from a set
+      const imageIndex = Math.floor(Math.random() * 4);
+      const imageUrls = [
+        "https://images.unsplash.com/photo-1554118811-1e0d58224f24?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Y29mZmVlJTIwc2hvcHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60",
+        "https://images.unsplash.com/photo-1600093463592-8e36ae95ef56?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8Y29mZmVlJTIwc2hvcHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60",
+        "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8Y29mZmVlJTIwc2hvcHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60",
+        "https://images.unsplash.com/photo-1559925393-8be0ec4767c8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8Y29mZmVlJTIwc2hvcHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60"
+      ];
+      
+      // For demo, we'll return a successful response
+      // In a real app, we would add to storage
+      res.status(201).json({ 
+        success: true, 
+        message: "Coffee shop added successfully",
+        shop: {
+          id: Math.floor(Math.random() * 1000) + 5, // Demo ID
+          ...validatedData,
+          latitude,
+          longitude,
+          imageUrl: imageUrls[imageIndex],
+          rating: 0,
+          reviewCount: 0,
+          isOpen: true,
+          distance: Math.random() * 3,
+          isFavorite: false
+        }
+      });
+    } catch (error) {
+      console.error("Error adding coffee shop:", error);
+      res.status(500).json({ message: "Failed to add coffee shop" });
+    }
+  });
 
   app.get("/api/coffee-shops/favorites", async (req: Request, res: Response) => {
     try {
