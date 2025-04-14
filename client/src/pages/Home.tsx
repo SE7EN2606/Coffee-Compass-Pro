@@ -8,7 +8,6 @@ import { CoffeeShop } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
-import { askSecrets } from '@lib/api';
 
 const Home = () => {
   const { toast } = useToast();
