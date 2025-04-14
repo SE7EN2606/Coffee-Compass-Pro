@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-[#F7F7F7] text-foreground;
+  }
+}
+
+@layer components {
+  .coffee-primary {
+    @apply bg-[#7C5A43] text-white;
+  }
+  
+  .coffee-secondary {
+    @apply bg-[#E8DCCA] text-[#7C5A43];
+  }
+  
+  .coffee-accent {
+    @apply bg-[#B85042] text-white;
+  }
+  
+  .coffee-light {
+    @apply bg-[#F5F1EA];
+  }
+  
+  .coffee-dark {
+    @apply bg-[#3C2A1E] text-[#E8DCCA];
+  }
+
+  .map-container {
+    @apply h-full min-h-[300px] w-full bg-[#E5E5E5];
+  }
+
+  .card-shadow {
+    @apply shadow-md transition-all duration-300;
+  }
+
+  .card-shadow:hover {
+    @apply transform -translate-y-1 shadow-lg;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    @apply w-1.5;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-[#F5F1EA];
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-[#7C5A43] rounded-full;
+  }
+}
