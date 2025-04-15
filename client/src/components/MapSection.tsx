@@ -58,6 +58,12 @@ const MapSection: React.FC<MapSectionProps> = ({ coffeeShops, onSelectShop }) =>
   useEffect(() => {
     if (scriptLoaded) return;
 
+    // Prevent multiple Google Maps scripts from loading
+    if (window.google && window.google.maps) {
+      setScriptLoaded(true);
+      return;
+    }
+
     // For demonstration, we'll use a fallback image map if the API key is not properly configured
     // In a production environment, always use the actual Google Maps API
     const loadMap = async () => {
@@ -73,8 +79,14 @@ const MapSection: React.FC<MapSectionProps> = ({ coffeeShops, onSelectShop }) =>
         const data = await response.json();
         const apiKey = data.key;
         
+        // Check if script is already loaded to prevent duplicates
+        if (document.querySelector('script[src*="maps.googleapis.com/maps/api/js"]')) {
+          console.log("Google Maps script already exists, not loading again");
+          setScriptLoaded(true);
+          return;
+        }
+        
         // For demo purposes, we're allowing the map to work even without a valid key
-        // so users can see the app functioning even if they don't have a Google Maps API key
         window.initGoogleMap = () => {
           setScriptLoaded(true);
         };
@@ -83,6 +95,7 @@ const MapSection: React.FC<MapSectionProps> = ({ coffeeShops, onSelectShop }) =>
         script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initGoogleMap`;
         script.async = true;
         script.defer = true;
+        script.id = "google-maps-script";
         script.onerror = () => {
           setLoadError("Failed to load Google Maps. Using fallback map interface.");
         };
@@ -95,12 +108,6 @@ const MapSection: React.FC<MapSectionProps> = ({ coffeeShops, onSelectShop }) =>
     };
 
     loadMap();
-
-    // For demo purposes, simulate map loading even without the API
-    setTimeout(() => {
-      setScriptLoaded(true);
-      setMapLoaded(true);
-    }, 1500);
 
     return () => {
       window.initGoogleMap = () => {};
