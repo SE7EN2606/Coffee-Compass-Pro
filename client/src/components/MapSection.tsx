@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { CoffeeShop } from '@/lib/types';
 import { MapPin } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface MapSectionProps {
   coffeeShops: CoffeeShop[];
