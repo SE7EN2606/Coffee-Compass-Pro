@@ -114,29 +114,11 @@ const MapSection: React.FC<MapSectionProps> = ({ coffeeShops, onSelectShop }) =>
     }
   }, [scriptLoaded, mapLoaded, initializeMap]);
 
-  // Get user's location
+  // Set a default location and don't automatically request user location
   useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const userPos = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          };
-          setUserLocation(userPos);
-          
-          // Center map on user's location if map is already loaded
-          if (map) {
-            map.setCenter(userPos);
-          }
-        },
-        (error) => {
-          console.warn("Geolocation error:", error.message);
-          // Using default NYC location as fallback
-        }
-      );
-    }
-  }, [map]);
+    // Default to San Francisco as starting point
+    setUserLocation({ lat: 37.7749, lng: -122.4194 });
+  }, []);
 
   // Update markers when coffee shops change
   useEffect(() => {
@@ -208,8 +190,15 @@ const MapSection: React.FC<MapSectionProps> = ({ coffeeShops, onSelectShop }) =>
     setMarkers(newMarkers);
   }, [coffeeShops, map, onSelectShop, userLocation]);
 
+  const { toast } = useToast();
+
   const handleUseMyLocation = () => {
     if (navigator.geolocation) {
+      toast({
+        title: "Accessing location",
+        description: "Requesting your current location...",
+      });
+      
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const newLocation = {
@@ -221,12 +210,43 @@ const MapSection: React.FC<MapSectionProps> = ({ coffeeShops, onSelectShop }) =>
           if (map) {
             map.setCenter(newLocation);
             map.setZoom(14);
+            
+            // Add a marker for user location
+            new window.google.maps.Marker({
+              position: newLocation,
+              map: map,
+              title: "Your Location",
+              icon: {
+                path: window.google.maps.SymbolPath.CIRCLE,
+                scale: 10,
+                fillColor: "#4285F4",
+                fillOpacity: 1,
+                strokeColor: "#ffffff",
+                strokeWeight: 2,
+              }
+            });
+            
+            toast({
+              title: "Location Updated",
+              description: "Map has been centered on your current location",
+            });
           }
         },
         (error) => {
           console.error("Error getting location:", error);
+          toast({
+            title: "Location Error",
+            description: "Could not access your location. Please check browser permissions.",
+            variant: "destructive"
+          });
         }
       );
+    } else {
+      toast({
+        title: "Location Not Supported",
+        description: "Geolocation is not supported by your browser.",
+        variant: "destructive"
+      });
     }
   };
 

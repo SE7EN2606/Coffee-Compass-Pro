@@ -61,7 +61,7 @@ const Home = () => {
   return (
     <div className="container mx-auto px-4 py-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-[#7C5A43]">Find Your Perfect Brew</h1>
+        <h1 className="text-2xl font-bold text-[#7C5A43]">CoffeeCompass</h1>
         <Button 
           onClick={() => setIsAddModalOpen(true)}
           className="bg-[#7C5A43] hover:bg-[#6a4c39] text-white flex items-center gap-2"

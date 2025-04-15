@@ -78,6 +78,9 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch }) => {
                 <SelectItem value="open_now">Open Now</SelectItem>
                 <SelectItem value="highest_rated">Highest Rated</SelectItem>
                 <SelectItem value="nearest">Nearest</SelectItem>
+                <SelectItem value="most_popular">Most Popular</SelectItem>
+                <SelectItem value="newest">Newest</SelectItem>
+                <SelectItem value="has_wifi">Has WiFi</SelectItem>
                 <SelectItem value="specialty">Specialty Coffee</SelectItem>
               </SelectContent>
             </Select>
@@ -145,7 +148,7 @@ const SearchSection: React.FC<SearchSectionProps> = ({ onSearch }) => {
                 <div>
                   <label className="block mb-2 text-sm font-medium text-gray-700">Coffee Types</label>
                   <div className="flex flex-wrap gap-2">
-                    {['Espresso', 'Cold Brew', 'Pour Over', 'Specialty'].map((type) => (
+                    {['Espresso', 'Cold Brew', 'Pour Over', 'Specialty', 'Latte', 'Cappuccino', 'Organic', 'Single Origin'].map((type) => (
                       <Button
                         key={type}
                         variant="outline"
