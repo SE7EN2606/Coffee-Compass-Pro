@@ -1,91 +1,65 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
-interface PlaceData {
-  placeId: string;
-  name: string;
-  address: string;
-  lat: number;
-  lng: number;
+interface AddCoffeeShopModalProps {
+  onClose: () => void;
+  onAddShop: (shop: { name: string; address: string; lat: number; lng: number }) => void;
 }
 
-const AddCoffeeShopModal = () => {
+const AddCoffeeShopModal: React.FC<AddCoffeeShopModalProps> = ({ onClose, onAddShop }) => {
+  const [shopName, setShopName] = useState('');
+  const [address, setAddress] = useState('');
+  const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const [placeData, setPlaceData] = useState<PlaceData | null>(null);
-  const [loading, setLoading] = useState(false);
+  const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
 
   useEffect(() => {
-    if (!window.google || !inputRef.current) return;
-
-    const autocomplete = new window.google.maps.places.Autocomplete(inputRef.current, {
-      types: ['establishment'],
-      fields: ['place_id', 'geometry', 'name', 'formatted_address'],
-    });
-
-    autocomplete.addListener('place_changed', () => {
-      const place = autocomplete.getPlace();
-      if (!place.geometry || !place.geometry.location) {
-        alert('No details available for input: ' + place.name);
-        return;
-      }
-
-      const lat = place.geometry.location.lat();
-      const lng = place.geometry.location.lng();
-      setPlaceData({
-        placeId: place.place_id || '',
-        name: place.name || '',
-        address: place.formatted_address || '',
-        lat,
-        lng,
+    if (inputRef.current && !autocompleteRef.current) {
+      autocompleteRef.current = new google.maps.places.Autocomplete(inputRef.current);
+      autocompleteRef.current.addListener('place_changed', () => {
+        const place = autocompleteRef.current?.getPlace();
+        if (place && place.geometry && place.geometry.location) {
+          setShopName(place.name || '');
+          setAddress(place.formatted_address || '');
+          setLocation({
+            lat: place.geometry.location.lat(),
+            lng: place.geometry.location.lng(),
+          });
+        }
       });
-    });
+    }
   }, []);
 
-  const handleSubmit = async () => {
-    if (!placeData) {
-      alert("Please select a valid place from the suggestions.");
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const response = await fetch('/api/coffee-shops', { // Update endpoint if needed
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(placeData),
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (location) {
+      onAddShop({
+        name: shopName,
+        address,
+        lat: location.lat,
+        lng: location.lng,
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to add coffee shop.');
-      }
-
-      alert('Coffee shop added successfully!');
-      window.location.reload(); // Refresh to show new shop
-    } catch (error) {
-      console.error(error);
-      alert('Something went wrong.');
-    } finally {
-      setLoading(false);
+      onClose();
+    } else {
+      alert('Please select a valid location from the autocomplete suggestions.');
     }
   };
 
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-semibold mb-4">Add a Coffee Shop</h2>
-      <input
-        type="text"
-        ref={inputRef}
-        placeholder="Enter coffee shop name"
-        className="border rounded p-2 w-full mb-4"
-      />
-      <button
-        onClick={handleSubmit}
-        disabled={loading}
-        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
-      >
-        {loading ? 'Adding...' : 'Add Coffee Shop'}
-      </button>
+    <div className="modal-overlay">
+      <div className="modal">
+        <h2>Add a Coffee Shop</h2>
+        <form onSubmit={handleSubmit}>
+          <input
+            ref={inputRef}
+            type="text"
+            placeholder="Enter coffee shop name"
+            value={shopName}
+            onChange={(e) => setShopName(e.target.value)}
+          />
+          <button type="submit">Add Shop</button>
+          <button type="button" onClick={onClose}>Cancel</button>
+        </form>
+      </div>
     </div>
   );
 };
