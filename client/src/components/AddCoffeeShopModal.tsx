@@ -13,8 +13,8 @@ const AddCoffeeShopModal: React.FC<AddCoffeeShopModalProps> = ({ onClose, onAddS
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
 
   useEffect(() => {
-    if (inputRef.current && !autocompleteRef.current) {
-      autocompleteRef.current = new google.maps.places.Autocomplete(inputRef.current);
+    if (inputRef.current && !autocompleteRef.current && window.google) {
+      autocompleteRef.current = new window.google.maps.places.Autocomplete(inputRef.current);
       autocompleteRef.current.addListener('place_changed', () => {
         const place = autocompleteRef.current?.getPlace();
         if (place && place.geometry && place.geometry.location) {
@@ -40,7 +40,7 @@ const AddCoffeeShopModal: React.FC<AddCoffeeShopModalProps> = ({ onClose, onAddS
       });
       onClose();
     } else {
-      alert('Please select a valid location from the autocomplete suggestions.');
+      alert('Please select a valid location from the suggestions.');
     }
   };
 
@@ -52,9 +52,7 @@ const AddCoffeeShopModal: React.FC<AddCoffeeShopModalProps> = ({ onClose, onAddS
           <input
             ref={inputRef}
             type="text"
-            placeholder="Enter coffee shop name"
-            value={shopName}
-            onChange={(e) => setShopName(e.target.value)}
+            placeholder="Search for coffee shop..."
           />
           <button type="submit">Add Shop</button>
           <button type="button" onClick={onClose}>Cancel</button>
